@@ -187,7 +187,7 @@ nav{
 }
 .product:hover{box-shadow:0 14px 30px rgba(42,10,16,.12);transform:translateY(-4px);}
 .product-img{
-  aspect-ratio:1/1;background:var(--maroon-950);
+  aspect-ratio:1/1;background:#fff;
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;position:relative;
 }
