@@ -65,12 +65,8 @@ nav{
   background:linear-gradient(180deg,var(--maroon-950) 0%, var(--maroon-900) 55%, var(--maroon-800) 100%);
   color:var(--cream);
   text-align:center;
-  padding:28px 6% 100px;
+  padding:28px 6% 60px;
   position:relative;
-}
-.hero::after{
-  content:"";position:absolute;left:0;right:0;bottom:0;height:60px;
-  background:linear-gradient(180deg, transparent, var(--cream));
 }
 .eyebrow{
   font-size:12px;letter-spacing:4px;color:var(--gold-soft);
