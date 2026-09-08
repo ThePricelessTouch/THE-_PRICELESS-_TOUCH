@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة تحكم — The Priceless Touch</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#1a0a0d; --panel:#241014; --line:rgba(230,207,160,0.15);
+    --gold:#c9a15a; --gold-soft:#e6cfa0; --cream:#f6efe4;
+    --danger:#c0392b; --ok:#4a9d5f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;font-family:'Cairo',sans-serif;background:var(--bg);color:var(--cream);
+    min-height:100vh;
+  }
+  header{
+    padding:20px 5%;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  }
+  header h1{font-size:18px;margin:0;color:var(--gold-soft);}
+  header .status{font-size:12px;opacity:.7;}
+  .wrap{max-width:900px;margin:0 auto;padding:24px 5% 80px;}
+  .setup{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:20px;margin-bottom:24px;
+  }
+  .setup p{font-size:13px;opacity:.75;line-height:1.8;margin:0 0 14px;}
+  .setup a{color:var(--gold-soft);}
+  label{display:block;font-size:13px;margin:14px 0 6px;color:var(--gold-soft);}
+  input[type=text], input[type=password], textarea{
+    width:100%;padding:10px 12px;border-radius:6px;border:1px solid var(--line);
+    background:#150809;color:var(--cream);font-family:inherit;font-size:14px;
+  }
+  textarea{resize:vertical;min-height:70px;}
+  input[type=color]{width:56px;height:36px;border:none;border-radius:6px;background:none;cursor:pointer;padding:0;}
+  .row{display:flex;align-items:center;gap:12px;}
+  .row label{margin:0;flex:1;}
+  button{
+    cursor:pointer;border:none;border-radius:6px;padding:11px 22px;font-family:inherit;
+    font-size:14px;font-weight:600;
+  }
+  .btn-gold{background:var(--gold-soft);color:#2a0a10;}
+  .btn-gold:hover{background:var(--gold);}
+  .btn-outline{background:transparent;border:1px solid var(--line);color:var(--cream);}
+  .btn-outline:hover{border-color:var(--gold);}
+  .btn-danger{background:transparent;border:1px solid var(--danger);color:#e8a79e;}
+  .btn-danger:hover{background:var(--danger);color:#fff;}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+  .tab{
+    padding:9px 18px;border-radius:20px;border:1px solid var(--line);
+    background:transparent;color:var(--cream);font-size:13px;cursor:pointer;
+  }
+  .tab.active{background:var(--gold-soft);color:#2a0a10;border-color:var(--gold-soft);}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:20px;margin-bottom:16px;
+  }
+  .card h3{margin:0 0 4px;font-size:15px;color:var(--gold-soft);}
+  .card .hint{font-size:12px;opacity:.6;margin:0 0 14px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr;}}
+  .save-bar{
+    position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--line);
+    padding:14px 0;display:flex;gap:10px;justify-content:flex-end;margin-top:10px;
+  }
+  .product-card{
+    border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:14px;position:relative;
+  }
+  .product-card .remove-btn{position:absolute;top:12px;left:12px;}
+  .msg{font-size:13px;padding:10px 14px;border-radius:6px;margin-bottom:14px;display:none;}
+  .msg.show{display:block;}
+  .msg.ok{background:rgba(74,157,95,.15);color:#8fd39f;border:1px solid rgba(74,157,95,.3);}
+  .msg.err{background:rgba(192,57,43,.15);color:#e8a79e;border:1px solid rgba(192,57,43,.3);}
+  .loader{font-size:13px;opacity:.7;}
+  .hidden{display:none;}
+  #logout{font-size:12px;opacity:.7;background:none;border:none;color:var(--cream);text-decoration:underline;cursor:pointer;padding:0;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>لوحة تحكم The Priceless Touch</h1>
+  <div class="status" id="conn-status">مش متصل</div>
+</header>
+
+<div class="wrap">
+
+  <div class="setup" id="setup-box">
+    <p>
+      عشان اللوحة تقدر تحفظ التعديلات على GitHub، محتاجة "مفتاح وصول" (Personal Access Token) تعمله إنت بنفسك مرة واحدة بس:<br>
+      1. روح لـ <a href="https://github.com/settings/tokens/new" target="_blank">هذا الرابط</a> (لازم تكون مسجل دخول بحساب ThePricelessTouch).<br>
+      2. في خانة Note اكتب أي اسم زي "admin-panel".<br>
+      3. من "Expiration" اختار مدة (سنة مثلاً).<br>
+      4. من "Select scopes" حدد صح على <b>repo</b> بس (الصندوق الكبير اللي فوق).<br>
+      5. انزل تحت واضغط "Generate token"، وانسخ المفتاح اللي هيظهر (يبدأ بـ ghp_) — مش هيتعرض تاني.<br>
+      6. الصقه هنا تحت واضغط "اتصال".
+    </p>
+    <label>مفتاح GitHub (Token)</label>
+    <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+    <div class="row" style="margin-top:14px;">
+      <button class="btn-gold" onclick="connect()">اتصال</button>
+      <button class="btn-outline" onclick="toggleAdvanced()">إعدادات متقدمة</button>
+    </div>
+    <div id="advanced" class="hidden" style="margin-top:14px;">
+      <label>اسم المستخدم/المنظمة</label>
+      <input type="text" id="owner-input" value="ThePricelessTouch">
+      <label>اسم الـ repo</label>
+      <input type="text" id="repo-input" value="THE-_PRICELESS-_TOUCH">
+      <label>اسم الـ branch</label>
+      <input type="text" id="branch-input" value="main">
+    </div>
+  </div>
+
+  <div id="app" class="hidden">
+    <div class="msg" id="msg"></div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="colors" onclick="showTab('colors')">الألوان</button>
+      <button class="tab" data-tab="texts" onclick="showTab('texts')">النصوص</button>
+      <button class="tab" data-tab="products" onclick="showTab('products')">المنتجات</button>
+      <button id="logout" onclick="logout()" style="margin-right:auto;">تسجيل خروج</button>
+    </div>
+
+    <!-- COLORS -->
+    <div class="panel active" id="panel-colors">
+      <div class="card">
+        <h3>ألوان الموقع</h3>
+        <p class="hint">غيّر أي لون وهيتحدث في كل الموقع (الهيدر، الفوتر، الأزرار، الخلفيات).</p>
+        <div class="grid2" id="colors-grid"></div>
+      </div>
+      <div class="save-bar">
+        <button class="btn-gold" onclick="saveColors()">حفظ الألوان</button>
+      </div>
+    </div>
+
+    <!-- TEXTS -->
+    <div class="panel" id="panel-texts">
+      <div class="card">
+        <h3>اسم الموقع</h3>
+        <p class="hint">بيظهر في أعلى وأسفل كل صفحات الموقع.</p>
+        <label>اسم الموقع (الجزء التقيل)</label>
+        <input type="text" id="t-site-part1">
+        <label>اسم الموقع (الجزء العادي)</label>
+        <input type="text" id="t-site-part2">
+      </div>
+      <div class="card">
+        <h3>الصفحة الرئيسية</h3>
+        <label>العنوان — السطر الأول</label>
+        <input type="text" id="t-hero1">
+        <label>العنوان — السطر الثاني</label>
+        <input type="text" id="t-hero2">
+        <label>الوصف تحت العنوان</label>
+        <textarea id="t-heropara"></textarea>
+        <label>نص الزرار</label>
+        <input type="text" id="t-herocta">
+      </div>
+      <div class="card">
+        <h3>صفحة المنتجات (Categories)</h3>
+        <label>العنوان</label>
+        <input type="text" id="t-cattitle">
+        <label>الوصف تحت العنوان</label>
+        <input type="text" id="t-catsub">
+      </div>
+      <div class="card">
+        <h3>الفوتر (يظهر في كل الصفحات)</h3>
+        <label>سطر الحقوق</label>
+        <input type="text" id="t-copy">
+        <label>سطر إخلاء المسؤولية (Affiliate)</label>
+        <textarea id="t-disc"></textarea>
+      </div>
+      <div class="save-bar">
+        <button class="btn-gold" onclick="saveTexts()">حفظ النصوص</button>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="panel" id="panel-products">
+      <div id="products-list"></div>
+      <button class="btn-outline" onclick="addProduct()" style="margin-bottom:20px;">+ إضافة منتج جديد</button>
+      <div class="save-bar">
+        <button class="btn-gold" onclick="saveProducts()">حفظ المنتجات</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="loader hidden" id="loader">بيحمّل من GitHub...</div>
+</div>
+
+<script>
+const API = 'https://api.github.com';
+let cfg = { token:'', owner:'', repo:'', branch:'' };
+let cache = { css:null, cssSha:null, index:null, indexSha:null, cat:null, catSha:null };
+
+const colorDefs = [
+  {key:'--maroon-950', label:'أغمق درجة كستنائي (خلفية الهيدر)'},
+  {key:'--maroon-900', label:'كستنائي غامق'},
+  {key:'--maroon-800', label:'كستنائي متوسط'},
+  {key:'--maroon-700', label:'كستنائي فاتح شوية'},
+  {key:'--gold', label:'دهبي أساسي'},
+  {key:'--gold-soft', label:'دهبي فاتح (كريمي)'},
+  {key:'--cream', label:'خلفية الصفحة (كريمي فاتح)'},
+  {key:'--ink', label:'لون النص الأساسي'},
+];
+
+function toggleAdvanced(){
+  document.getElementById('advanced').classList.toggle('hidden');
+}
+
+function showMsg(text, ok){
+  const m = document.getElementById('msg');
+  m.textContent = text;
+  m.className = 'msg show ' + (ok ? 'ok' : 'err');
+  setTimeout(()=>{ m.className = 'msg'; }, 4000);
+}
+
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+}
+
+function logout(){
+  localStorage.removeItem('ptt_admin_cfg');
+  location.reload();
+}
+
+async function ghGet(path){
+  const res = await fetch(`${API}/repos/${cfg.owner}/${cfg.repo}/contents/${path}?ref=${cfg.branch}`, {
+    headers: { 'Authorization': `token ${cfg.token}`, 'Accept':'application/vnd.github+json' }
+  });
+  if(!res.ok) throw new Error(`تعذر تحميل ${path} (${res.status})`);
+  const data = await res.json();
+  const content = decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))));
+  return { content, sha: data.sha };
+}
+
+async function ghPut(path, content, sha, message){
+  const b64 = btoa(unescape(encodeURIComponent(content)));
+  const res = await fetch(`${API}/repos/${cfg.owner}/${cfg.repo}/contents/${path}`, {
+    method:'PUT',
+    headers: { 'Authorization': `token ${cfg.token}`, 'Accept':'application/vnd.github+json', 'Content-Type':'application/json' },
+    body: JSON.stringify({ message, content: b64, sha, branch: cfg.branch })
+  });
+  if(!res.ok){
+    const err = await res.json().catch(()=>({}));
+    throw new Error(err.message || `فشل الحفظ (${res.status})`);
+  }
+  return await res.json();
+}
+
+async function connect(){
+  const token = document.getElementById('token-input').value.trim();
+  if(!token){ showMsg('لازم تدخل المفتاح الأول', false); return; }
+  cfg.token = token;
+  cfg.owner = document.getElementById('owner-input').value.trim();
+  cfg.repo = document.getElementById('repo-input').value.trim();
+  cfg.branch = document.getElementById('branch-input').value.trim();
+
+  document.getElementById('loader').classList.remove('hidden');
+  try{
+    // quick auth check
+    const check = await fetch(`${API}/repos/${cfg.owner}/${cfg.repo}`, { headers:{ 'Authorization': `token ${cfg.token}` }});
+    if(!check.ok) throw new Error('تعذر الاتصال — تأكد من المفتاح واسم الـ repo');
+
+    localStorage.setItem('ptt_admin_cfg', JSON.stringify(cfg));
+    document.getElementById('setup-box').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    document.getElementById('conn-status').textContent = 'متصل بـ ' + cfg.owner + '/' + cfg.repo;
+    await loadAll();
+  }catch(e){
+    showMsg(e.message, false);
+  }finally{
+    document.getElementById('loader').classList.add('hidden');
+  }
+}
+
+async function loadAll(){
+  document.getElementById('loader').classList.remove('hidden');
+  try{
+    const [css, index, cat] = await Promise.all([
+      ghGet('style.css'), ghGet('index.html'), ghGet('categories.html')
+    ]);
+    cache.css = css.content; cache.cssSha = css.sha;
+    cache.index = index.content; cache.indexSha = index.sha;
+    cache.cat = cat.content; cache.catSha = cat.sha;
+    renderColors();
+    renderTexts();
+    renderProducts();
+  }catch(e){
+    showMsg(e.message, false);
+  }finally{
+    document.getElementById('loader').classList.add('hidden');
+  }
+}
+
+// ---------- COLORS ----------
+function renderColors(){
+  const grid = document.getElementById('colors-grid');
+  grid.innerHTML = '';
+  colorDefs.forEach(c=>{
+    const m = new RegExp(c.key.replace('--','--').replace(/[-]/g,'\\-') + '\\s*:\\s*(#[0-9a-fA-F]{3,8})').exec(cache.css);
+    const val = m ? m[1] : '#000000';
+    const wrap = document.createElement('div');
+    wrap.className = 'row';
+    wrap.style.marginBottom = '12px';
+    wrap.innerHTML = `
+      <input type="color" data-key="${c.key}" value="${normalizeHex(val)}">
+      <label>${c.label}</label>
+    `;
+    grid.appendChild(wrap);
+  });
+}
+function normalizeHex(v){
+  if(v.length===4){ // #abc -> #aabbcc
+    return '#' + v[1]+v[1]+v[2]+v[2]+v[3]+v[3];
+  }
+  return v.slice(0,7);
+}
+async function saveColors(){
+  let css = cache.css;
+  document.querySelectorAll('#colors-grid input[type=color]').forEach(inp=>{
+    const key = inp.dataset.key;
+    const re = new RegExp('(' + key.replace(/[-]/g,'\\-') + '\\s*:\\s*)(#[0-9a-fA-F]{3,8])', 'g');
+    // safer manual replace
+    const full = new RegExp(key.replace(/[-]/g,'\\-') + '\\s*:\\s*#[0-9a-fA-F]{3,8};');
+    css = css.replace(full, key + ':' + inp.value + ';');
+  });
+  document.getElementById('loader').classList.remove('hidden');
+  try{
+    const result = await ghPut('style.css', css, cache.cssSha, 'تحديث الألوان من لوحة التحكم');
+    cache.css = css; cache.cssSha = result.content.sha;
+    showMsg('اتحفظت الألوان بنجاح ✔', true);
+  }catch(e){ showMsg(e.message, false); }
+  finally{ document.getElementById('loader').classList.add('hidden'); }
+}
+
+// ---------- TEXTS ----------
+function getMarker(html, key){
+  const re = new RegExp(`<!--EDIT:${key}-->([\\s\\S]*?)<!--/EDIT-->`);
+  const m = re.exec(html);
+  return m ? m[1] : '';
+}
+function setMarker(html, key, value){
+  const re = new RegExp(`(<!--EDIT:${key}-->)([\\s\\S]*?)(<!--/EDIT-->)`);
+  return html.replace(re, (_, a, b, c) => a + value + c);
+}
+
+function renderTexts(){
+  document.getElementById('t-site-part1').value = 'THE PRICELESS ';
+  document.getElementById('t-site-part2').value = getMarker(cache.index, 'site_name').replace(/<span>|<\/span>/g,'').replace('THE PRICELESS ','') || 'TOUCH';
+  document.getElementById('t-hero1').value = getMarker(cache.index, 'hero_title_1');
+  document.getElementById('t-hero2').value = getMarker(cache.index, 'hero_title_2');
+  document.getElementById('t-heropara').value = getMarker(cache.index, 'hero_para');
+  document.getElementById('t-herocta').value = getMarker(cache.index, 'hero_cta');
+  document.getElementById('t-cattitle').value = getMarker(cache.cat, 'cat_title');
+  document.getElementById('t-catsub').value = getMarker(cache.cat, 'cat_subtitle');
+  document.getElementById('t-copy').value = getMarker(cache.index, 'footer_copy');
+  document.getElementById('t-disc').value = getMarker(cache.index, 'footer_disclaimer');
+}
+
+async function saveTexts(){
+  let index = cache.index;
+  let cat = cache.cat;
+
+  const siteName = document.getElementById('t-site-part1').value + '<span>' + document.getElementById('t-site-part2').value + '</span>';
+  index = setMarker(index, 'site_name', siteName);
+  cat = setMarker(cat, 'site_name', siteName);
+
+  index = setMarker(index, 'hero_title_1', document.getElementById('t-hero1').value);
+  index = setMarker(index, 'hero_title_2', document.getElementById('t-hero2').value);
+  index = setMarker(index, 'hero_para', document.getElementById('t-heropara').value);
+  index = setMarker(index, 'hero_cta', document.getElementById('t-herocta').value);
+
+  cat = setMarker(cat, 'cat_title', document.getElementById('t-cattitle').value);
+  cat = setMarker(cat, 'cat_subtitle', document.getElementById('t-catsub').value);
+
+  const copy = document.getElementById('t-copy').value;
+  const disc = document.getElementById('t-disc').value;
+  index = setMarker(index, 'footer_copy', copy);
+  index = setMarker(index, 'footer_disclaimer', disc);
+  cat = setMarker(cat, 'footer_copy', copy);
+  cat = setMarker(cat, 'footer_disclaimer', disc);
+
+  document.getElementById('loader').classList.remove('hidden');
+  try{
+    const r1 = await ghPut('index.html', index, cache.indexSha, 'تحديث النصوص من لوحة التحكم');
+    cache.index = index; cache.indexSha = r1.content.sha;
+    const r2 = await ghPut('categories.html', cat, cache.catSha, 'تحديث النصوص من لوحة التحكم');
+    cache.cat = cat; cache.catSha = r2.content.sha;
+    showMsg('اتحفظت النصوص بنجاح ✔', true);
+  }catch(e){ showMsg(e.message, false); }
+  finally{ document.getElementById('loader').classList.add('hidden'); }
+}
+
+// ---------- PRODUCTS ----------
+function getProductsData(){
+  const re = /<script id="products-data" type="application\/json">([\s\S]*?)<\/script>/;
+  const m = re.exec(cache.cat);
+  if(!m) return [];
+  try{ return JSON.parse(m[1].trim()); }catch(e){ return []; }
+}
+function setProductsData(list){
+  const re = /(<script id="products-data" type="application\/json">)([\s\S]*?)(<\/script>)/;
+  const json = JSON.stringify(list, null, 2);
+  cache.cat = cache.cat.replace(re, (_, a, b, c) => a + '\n' + json + '\n' + c);
+}
+
+let productsState = [];
+
+function renderProducts(){
+  productsState = getProductsData();
+  drawProducts();
+}
+
+function drawProducts(){
+  const list = document.getElementById('products-list');
+  list.innerHTML = '';
+  if(productsState.length === 0){
+    list.innerHTML = '<p class="hint" style="margin-bottom:16px;">مفيش منتجات دلوقتي. دوس "إضافة منتج جديد" عشان تبدأ.</p>';
+  }
+  productsState.forEach((p, i)=>{
+    const div = document.createElement('div');
+    div.className = 'product-card';
+    div.innerHTML = `
+      <button class="btn-danger remove-btn" onclick="removeProduct(${i})">حذف</button>
+      <label>اسم المنتج</label>
+      <input type="text" value="${escapeAttr(p.name||'')}" oninput="updateProduct(${i},'name',this.value)">
+      <label>الوصف</label>
+      <input type="text" value="${escapeAttr(p.desc||'')}" oninput="updateProduct(${i},'desc',this.value)">
+      <label>رابط الصورة</label>
+      <input type="text" value="${escapeAttr(p.image||'')}" oninput="updateProduct(${i},'image',this.value)">
+      <label>رابط الشراء (Affiliate)</label>
+      <input type="text" value="${escapeAttr(p.link||'')}" oninput="updateProduct(${i},'link',this.value)">
+      <label>شارة (اختياري، زي Best Seller)</label>
+      <input type="text" value="${escapeAttr(p.tag||'')}" oninput="updateProduct(${i},'tag',this.value)">
+    `;
+    list.appendChild(div);
+  });
+}
+function escapeAttr(s){ return String(s).replace(/"/g,'&quot;'); }
+
+function updateProduct(i, key, val){ productsState[i][key] = val; }
+function removeProduct(i){ productsState.splice(i,1); drawProducts(); }
+function addProduct(){
+  productsState.push({name:'', desc:'', image:'', link:'', tag:''});
+  drawProducts();
+}
+
+async function saveProducts(){
+  setProductsData(productsState);
+  document.getElementById('loader').classList.remove('hidden');
+  try{
+    const r = await ghPut('categories.html', cache.cat, cache.catSha, 'تحديث المنتجات من لوحة التحكم');
+    cache.catSha = r.content.sha;
+    showMsg('اتحفظت المنتجات بنجاح ✔', true);
+  }catch(e){ showMsg(e.message, false); }
+  finally{ document.getElementById('loader').classList.add('hidden'); }
+}
+
+// ---------- INIT ----------
+(function init(){
+  const saved = localStorage.getItem('ptt_admin_cfg');
+  if(saved){
+    try{
+      cfg = JSON.parse(saved);
+      document.getElementById('token-input').value = cfg.token;
+      document.getElementById('owner-input').value = cfg.owner;
+      document.getElementById('repo-input').value = cfg.repo;
+      document.getElementById('branch-input').value = cfg.branch;
+      connect();
+    }catch(e){}
+  }
+})();
+</script>
+
+</body>
+</html>

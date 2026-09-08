@@ -7,13 +7,13 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 
 <nav>
   <a href="index.html" class="logo-wrap">
-    <span class="logo">THE PRICELESS <span>TOUCH</span></span>
+    <span class="logo"><!--EDIT:site_name-->THE PRICELESS <span>TOUCH</span><!--/EDIT--></span>
   </a>
   <ul class="nav-links">
     <li><a href="index.html">Home</a></li>
@@ -24,42 +24,50 @@
 
 <header class="page-header">
   <div class="crumb"><a href="index.html">Home</a> / Categories</div>
-  <h1 class="serif">Categories</h1>
-  <p>Everything we currently carry, all in one place.</p>
+  <h1 class="serif"><!--EDIT:cat_title-->Categories<!--/EDIT--></h1>
+  <p><!--EDIT:cat_subtitle-->Everything we currently carry, all in one place.<!--/EDIT--></p>
 </header>
 
 <section class="section">
-  <div class="products">
-
-    <!--
-      TO ADD A NEW PRODUCT: paste a block like this inside .products:
-
-      <div class="product">
-        <div class="product-img">
-          <img src="your-image.jpg" alt="Product name">
-          <span class="tag">Best Seller</span>
-        </div>
-        <div class="product-body">
-          <div class="p-name">Product name</div>
-          <div class="p-desc">One short line describing it.</div>
-          <div class="p-row">
-            <a href="https://your-affiliate-link" class="p-cta" target="_blank" rel="noopener nofollow sponsored">Buy Now</a>
-          </div>
-        </div>
-      </div>
-
-      then edit: img src, alt text, p-name, p-desc, and the href to your real affiliate link.
-    -->
-
-  </div>
+  <div class="products" id="products-container"></div>
 </section>
+
+<script id="products-data" type="application/json">
+[]
+</script>
+<script>
+(function(){
+  var raw = document.getElementById('products-data').textContent;
+  var data = [];
+  try { data = JSON.parse(raw); } catch(e) { data = []; }
+  var container = document.getElementById('products-container');
+  data.forEach(function(p){
+    var div = document.createElement('div');
+    div.className = 'product';
+    var tagHtml = p.tag ? '<span class="tag">' + p.tag + '</span>' : '';
+    div.innerHTML =
+      '<div class="product-img">' +
+        '<img src="' + p.image + '" alt="' + p.name + '">' +
+        tagHtml +
+      '</div>' +
+      '<div class="product-body">' +
+        '<div class="p-name">' + p.name + '</div>' +
+        '<div class="p-desc">' + p.desc + '</div>' +
+        '<div class="p-row">' +
+          '<a href="' + p.link + '" class="p-cta" target="_blank" rel="noopener nofollow sponsored">Buy Now</a>' +
+        '</div>' +
+      '</div>';
+    container.appendChild(div);
+  });
+})();
+</script>
 
 <footer>
   <a href="index.html" class="logo-wrap">
-    <span class="logo">THE PRICELESS <span>TOUCH</span></span>
+    <span class="logo"><!--EDIT:site_name-->THE PRICELESS <span>TOUCH</span><!--/EDIT--></span>
   </a>
-  <div>© 2026 The Priceless Touch — All rights reserved</div>
-  <p class="disc">This site may contain affiliate links. If you purchase through them, we may earn a commission at no extra cost to you.</p>
+  <div><!--EDIT:footer_copy-->© 2026 The Priceless Touch — All rights reserved<!--/EDIT--></div>
+  <p class="disc"><!--EDIT:footer_disclaimer-->This site may contain affiliate links. If you purchase through them, we may earn a commission at no extra cost to you.<!--/EDIT--></p>
 </footer>
 
 </body>
